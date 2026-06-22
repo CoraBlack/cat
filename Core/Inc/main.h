@@ -67,10 +67,30 @@ void Error_Handler(void);
 #define Motor_Right_BIN1_GPIO_Port GPIOC
 #define Motor_Right_BIN2_Pin GPIO_PIN_3
 #define Motor_Right_BIN2_GPIO_Port GPIOC
-#define Motor_Left_PWM_Pin GPIO_PIN_0
-#define Motor_Left_PWM_GPIO_Port GPIOA
-#define Motor_Right_PWM_Pin GPIO_PIN_6
-#define Motor_Right_PWM_GPIO_Port GPIOA
+#define Motor_PWM_Pin GPIO_PIN_6
+#define Motor_PWM_GPIO_Port GPIOA
+#define Oled_MOSI_Pin GPIO_PIN_7
+#define Oled_MOSI_GPIO_Port GPIOA
+#define LeftFront_Pin GPIO_PIN_0
+#define LeftFront_GPIO_Port GPIOB
+#define LeftFront_EXTI_IRQn EXTI0_IRQn
+#define LeftReap_Pin GPIO_PIN_1
+#define LeftReap_GPIO_Port GPIOB
+#define LeftReap_EXTI_IRQn EXTI1_IRQn
+#define RightFront_Pin GPIO_PIN_2
+#define RightFront_GPIO_Port GPIOB
+#define RightFront_EXTI_IRQn EXTI2_IRQn
+#define RightReap_Pin GPIO_PIN_10
+#define RightReap_GPIO_Port GPIOB
+#define RightReap_EXTI_IRQn EXTI15_10_IRQn
+#define Oled_SCK_Pin GPIO_PIN_3
+#define Oled_SCK_GPIO_Port GPIOB
+#define Oled_MISO_Pin GPIO_PIN_4
+#define Oled_MISO_GPIO_Port GPIOB
+#define ToF_SCL_Pin GPIO_PIN_6
+#define ToF_SCL_GPIO_Port GPIOB
+#define ToF_SDA_Pin GPIO_PIN_7
+#define ToF_SDA_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
