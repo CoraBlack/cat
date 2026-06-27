@@ -230,23 +230,22 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**SPI1 GPIO Configuration
-    PA6     ------> SPI1_MISO
     PA7     ------> SPI1_MOSI
     PB3     ------> SPI1_SCK
     */
-    GPIO_InitStruct.Pin = Oled_MISO_Pin|Oled_MOSI_Pin;
+    GPIO_InitStruct.Pin = OLED_SPI1_MOSI_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_Init(OLED_SPI1_MOSI_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = Oled_SCK_Pin;
+    GPIO_InitStruct.Pin = OLED_SPI1_SCK_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
-    HAL_GPIO_Init(Oled_SCK_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(OLED_SPI1_SCK_GPIO_Port, &GPIO_InitStruct);
 
     /* USER CODE BEGIN SPI1_MspInit 1 */
 
@@ -305,13 +304,12 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     __HAL_RCC_SPI1_CLK_DISABLE();
 
     /**SPI1 GPIO Configuration
-    PA6     ------> SPI1_MISO
     PA7     ------> SPI1_MOSI
     PB3     ------> SPI1_SCK
     */
-    HAL_GPIO_DeInit(GPIOA, Oled_MISO_Pin|Oled_MOSI_Pin);
+    HAL_GPIO_DeInit(OLED_SPI1_MOSI_GPIO_Port, OLED_SPI1_MOSI_Pin);
 
-    HAL_GPIO_DeInit(Oled_SCK_GPIO_Port, Oled_SCK_Pin);
+    HAL_GPIO_DeInit(OLED_SPI1_SCK_GPIO_Port, OLED_SPI1_SCK_Pin);
 
     /* USER CODE BEGIN SPI1_MspDeInit 1 */
 
@@ -499,7 +497,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     PA2     ------> USART2_TX
     PA3     ------> USART2_RX
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+    GPIO_InitStruct.Pin = Vision_USART_RX_Pin|Vision_USART_TX_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -551,7 +549,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     PA2     ------> USART2_TX
     PA3     ------> USART2_RX
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
+    HAL_GPIO_DeInit(GPIOA, Vision_USART_RX_Pin|Vision_USART_TX_Pin);
 
     /* USER CODE BEGIN USART2_MspDeInit 1 */
 

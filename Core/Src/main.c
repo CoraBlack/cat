@@ -21,7 +21,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stm32f4xx.h"
+#include "emotion.h"
+#include "animation.h"
+#include "interaction.h"
+#include <stdint.h>#include "stm32f4xx.h"
 #include "stm32f4xx_hal_def.h"
 #include "vl53l0x.h"
 #include "OLED.h"
@@ -36,7 +39,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-extern short int statu;
+#define TASK_PERIOD_OLED_MX 100         // OLED动画更新周期，单位毫秒
+#define TASK_PERIOD_INFRARED_MX 20      // 红外传感器读取周期，单位毫秒
+#define TASK_PERIOD_MOTOR_MX 20         // 电机控制周期，单位毫秒
+#define TASK_PERIOD_SERIAL_POST_MX 50   // 串口数据接收处理周期，单位毫秒
+//......extern short int statu;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,7 +65,11 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+OledTypedef oled;
+uint32_t last_infrared_time = 0;
+uint32_t last_animation_time = 0;
+uint32_t last_motor_time = 0;
+uint32_t last_interaction_time = 0; // 加了这一行：交互模块时间基准
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -126,17 +137,57 @@ int main(void)
   OLED_Init();
   VL53L0X_Init();
 
+
+  // OLED 屏幕初始化配置
+  OledInitTypeDef oled_init_config = {
+      .hspi = &hspi1,
+      .CS_port = OLED_CS_GPIO_Port,
+      .CS_pin = OLED_CS_Pin,
+      .DC_port = OLED_DC_GPIO_Port,
+      .DC_pin = OLED_DC_Pin,
+      .RST_port = OLED_RST_GPIO_Port,
+      .RST_pin = OLED_RST_Pin
+  };
+  oled_init(&oled, &oled_init_config);
+  oled_clear_buffer(&oled);
+  oled_refresh(&oled);
+
+  Interaction_Init(&huart1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      uint32_t now = HAL_GetTick();
+
+      // 1. 串口交互处理任务 (接收 Python 视觉动作并切换表情)
+      if (now - last_interaction_time >= TASK_PERIOD_SERIAL_POST_MX) {
+          last_interaction_time = now;
+          Interaction_Update(); 
+      }
+
+      // 2. 红外检测任务
+      if (now - last_infrared_time >= TASK_PERIOD_INFRARED_MX) {
+          last_infrared_time = now;
+          // INFRARED的对外接口
+      }
+
+      // 3. OLED 动画刷新任务
+      if (now - last_animation_time >= TASK_PERIOD_OLED_MX) {
+          last_animation_time = now;
+          animation_update(&oled);
+      }
+
+      // 4. 电机任务
+      if (now - last_motor_time >= TASK_PERIOD_MOTOR_MX) {
+          last_motor_time = now;
+          // 电机的对外接口
+      }
+      
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-
   }
   /* USER CODE END 3 */
 }
@@ -551,19 +602,26 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|Motor_Left_AIN2_Pin|Motor_Right_BIN2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, OLED_RST_Pin|GPIO_PIN_0|Motor_Left_AIN2_Pin|Motor_Right_BIN2_Pin
+                          |OLED_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PC0 Motor_Left_AIN2_Pin Motor_Right_BIN2_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|Motor_Left_AIN2_Pin|Motor_Right_BIN2_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(OLED_DC_GPIO_Port, OLED_DC_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : OLED_RST_Pin PC0 Motor_Left_AIN2_Pin Motor_Right_BIN2_Pin
+                           OLED_CS_Pin */
+  GPIO_InitStruct.Pin = OLED_RST_Pin|GPIO_PIN_0|Motor_Left_AIN2_Pin|Motor_Right_BIN2_Pin
+                          |OLED_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -582,11 +640,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PA6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pins : LeftFront_Pin LeftReap_Pin RightFront_Pin RightReap_Pin */
   GPIO_InitStruct.Pin = LeftFront_Pin|LeftReap_Pin|RightFront_Pin|RightReap_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : OLED_DC_Pin */
+  GPIO_InitStruct.Pin = OLED_DC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(OLED_DC_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
