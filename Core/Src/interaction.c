@@ -50,59 +50,60 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 // 表情切换逻辑
-void Interaction_Update(void)
-{
-    // 如果没有接收到新动作，直接退出
-    if (current_action == ACTION_NONE) {
+// interaction.c (省略了头文件和中断接收部分，只看核心更新函数)
+
+void interaction_update(void) {
+    // 如果没有接收到任何视觉新动作，直接退出
+    if (current_action == GestureAction_None) {
         return;
     }
 
-    switch (current_action) 
-    {
-        // ==========================================
-        // 动作：挥手 (WAVE)
-        // 逻辑：醒的话睡，睡的话醒
-        // ==========================================
-        case ACTION_WAVE:
-            // 使用 get_pet_emotion() 获取当前目标状态来做判断
-            if (get_pet_emotion() == Emotion_Sleep) {
-                // set_pet_emotion(Emotion_Normal); // 睡醒变正常
-            } else {
-                // set_pet_emotion(Emotion_Sleep);  // 醒着去睡觉
-            }
-            break;
+    PetState current_main_state = get_pet_main_state();
 
-        // ==========================================
-        // 动作：出拳 (PUNCH) -> 切换为生气
-        // ==========================================
-        case ACTION_PUNCH:
+    // ==========================================
+    // 最高优先级：摆手 (WAVE) 控制睡与醒
+    // 逻辑：无视当前是什么模式，睡就醒，醒就睡
+    // ==========================================
+    if (current_action == GestureAction_Wave) {
+        if (current_main_state == PetState_Asleep) {
+            set_pet_main_state(PetState_Awake);
+            set_pet_emotion(Emotion_Normal); // 睡醒默认回到普通清醒状态
+        } else {
+            set_pet_main_state(PetState_Asleep);
+        }
+        current_action = GestureAction_None;
+        return; 
+    }
+
+    // ==========================================
+    // 状态拦截墙：睡觉时，或听觉接管时，视觉动作无效
+    // ==========================================
+    if (current_main_state == PetState_Asleep || current_main_state == PetState_AudioMode) {
+        // 直接清空视觉指令并退出，把表情控制权完全让给睡眠逻辑或听觉同学的代码
+        current_action = GestureAction_None;
+        return;
+    }
+
+    // ==========================================
+    // 常规视觉交互逻辑 (仅在 PetState_Awake 状态下有效)
+    // ==========================================
+    switch (current_action) {
+        case GestureAction_Punch:
             set_pet_emotion(Emotion_Angry);
             break;
 
-        // ==========================================
-        // 动作：指着 (POINT) -> 切换为好奇
-        // ==========================================
-        case ACTION_POINT:
+        case GestureAction_Point:
             set_pet_emotion(Emotion_Curious);
             break;
 
-        // ==========================================
-        // 动作：比心 (HEART) -> 切换为害羞
-        // ==========================================
-        case ACTION_HEART:
+        case GestureAction_Heart:
             set_pet_emotion(Emotion_Shy);
             break;
 
-        // 其他未知动作不做处理
         default:
             break;
     }
 
-    // 逻辑处理完毕，清空标志，等待下一次串口下发动作
-    current_action = ACTION_NONE;
+    // 清空标志，等待下一次动作
+    current_action = GestureAction_None;
 }
-
-GestureActionDef Interaction_GetCurrentAction(void) {
-    return current_action;
-}
-·
