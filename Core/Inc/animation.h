@@ -1,7 +1,7 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "animation.h"
+#include "emotion.h"
 #include "oled.h"
 
 typedef struct {
