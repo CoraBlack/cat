@@ -44,8 +44,33 @@ set(STM_DIR ${PROJECT_SOURCE_DIR}/Core/Src)
 
 
 
-file(GLOB HARDWARE_SRCS CONFIGURE_DEPENDS "${HARDWARE_DIR}/*.c")
-file(GLOB STM_SRCS CONFIGURE_DEPENDS "${STM_DIR}/*.c")
+# file(GLOB HARDWARE_SRCS CONFIGURE_DEPENDS "${HARDWARE_DIR}/*.c")
+# file(GLOB STM_SRCS CONFIGURE_DEPENDS "${STM_DIR}/*.c")
+
+set (HARDWARE_SRCS
+    "./Core/Hardware/Distance_Sensor.c"
+    "./Core/Hardware/ESP_SPI.c"
+    "./Core/Hardware/INMP441.c"
+    "./Core/Hardware/IR.c"
+    "./Core/Hardware/MAX98357.c"
+    "./Core/Hardware/Motor.c"
+    "./Core/Hardware/OLED.c"
+    "./Core/Hardware/TEXT_OLED.c"
+)
+
+set (STM_SRCS 
+    # "./Core/Src/animation.c"
+    "./Core/Src/base64.c"
+    "./Core/Src/cJSON.c"
+    "./Core/Src/interaction.c"
+    "./Core/Src/main.c"
+    "./Core/Src/oled_frames.c"
+    "./Core/Src/stm32f4xx_hal_msp.c"
+    "./Core/Src/stm32f4xx_it.c"
+    "./Core/Src/syscalls.c"
+    "./Core/Src/sysmem.c"
+    "./Core/Src/system_stm32f4xx.c"
+)
 
 list(FILTER STM_SRCS EXCLUDE REGEX ".*system_stm32f4xx\\.c$")
 
