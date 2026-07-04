@@ -6,11 +6,11 @@
 #include "emotion.h"
 
 typedef enum {
-    ACTION_NONE  = 0x00,
-    ACTION_WAVE  = 0x01,
-    ACTION_PUNCH = 0x04,
-    ACTION_POINT = 0x05,
-    ACTION_HEART = 0x06
+    ACTION_NONE         = 0x00, // 无动作
+    ACTION_WAVE_HAND    = 0x01, // 挥手 (比单纯的 WAVE 更明确是手部动作)
+    ACTION_PUNCH        = 0x04, // 出拳 (原 0x04 保留)
+    ACTION_POINTING     = 0x05, // 用手指 (Pointing 明确表示“正在指着”的动作)
+    ACTION_FINGER_HEART = 0x06  // 比心 (Finger Heart 是国际通用的“单手比心”英文)
 } GestureActionDef;
 
 /**
@@ -37,4 +37,11 @@ void Interaction_Update(void);
  * @note   获取当前解析出的手势动作
  */
 GestureActionDef Interaction_GetCurrentAction(void);
+
+/**
+ * @brief  查询当前解析出的 X 轴偏移量 (对外接口)
+ * @param  None
+ * @retval int8_t 当前解析出的 X 轴偏移量 (左正右负)
+ */
+int8_t Interaction_GetXOffset(void);
 #endif 
