@@ -91,6 +91,15 @@ void Error_Handler(void);
 #define RightReap_Pin GPIO_PIN_10
 #define RightReap_GPIO_Port GPIOB
 #define RightReap_EXTI_IRQn EXTI15_10_IRQn
+#define ESP_Bridhe_SCK_Pin GPIO_PIN_13
+#define ESP_Bridhe_SCK_GPIO_Port GPIOB
+#define ESP_Bridge_MISO_Pin GPIO_PIN_14
+#define ESP_Bridge_MISO_GPIO_Port GPIOB
+#define ESP_Bridge_MOSI_Pin GPIO_PIN_15
+#define ESP_Bridge_MOSI_GPIO_Port GPIOB
+#define ESP_Bridge_HS_Pin GPIO_PIN_6
+#define ESP_Bridge_HS_GPIO_Port GPIOC
+#define ESP_Bridge_HS_EXTI_IRQn EXTI9_5_IRQn
 #define Distance_Trig_Pin GPIO_PIN_8
 #define Distance_Trig_GPIO_Port GPIOC
 #define OLED_SPI1_SCK_Pin GPIO_PIN_3
