@@ -100,6 +100,8 @@ void Error_Handler(void);
 #define ESP_Bridge_HS_Pin GPIO_PIN_6
 #define ESP_Bridge_HS_GPIO_Port GPIOC
 #define ESP_Bridge_HS_EXTI_IRQn EXTI9_5_IRQn
+#define ESP_Bridge_CS_Pin GPIO_PIN_7
+#define ESP_Bridge_CS_GPIO_Port GPIOC
 #define Distance_Trig_Pin GPIO_PIN_8
 #define Distance_Trig_GPIO_Port GPIOC
 #define OLED_SPI1_SCK_Pin GPIO_PIN_3

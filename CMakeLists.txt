@@ -62,7 +62,7 @@ set (STM_SRCS
     # "./Core/Src/animation.c"
     "./Core/Src/base64.c"
     "./Core/Src/cJSON.c"
-    "./Core/Src/interaction.c"
+    # "./Core/Src/interaction.c"
     "./Core/Src/main.c"
     "./Core/Src/oled_frames.c"
     "./Core/Src/stm32f4xx_hal_msp.c"
