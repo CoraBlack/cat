@@ -1,8 +1,8 @@
 #ifndef __MOTOR_H
 #define __MOTOR_H
 
-void Motor_TurnLeft(int Steering_Angle);
-void Motor_TurnRight(int Steering_Angle);
+void Motor_Left();
+void Motor_Right();
 void Motor_Back();
 void Motor_Stop();
 void Motor_Forward();

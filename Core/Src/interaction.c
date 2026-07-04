@@ -105,4 +105,3 @@ void Interaction_Update(void)
 GestureActionDef Interaction_GetCurrentAction(void) {
     return current_action;
 }
-·

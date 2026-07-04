@@ -59,8 +59,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define OLED_DC_Pin GPIO_PIN_13
+#define OLED_DC_GPIO_Port GPIOC
 #define OLED_RST_Pin GPIO_PIN_15
 #define OLED_RST_GPIO_Port GPIOC
+#define Motor_Left_AIN1_Pin GPIO_PIN_0
+#define Motor_Left_AIN1_GPIO_Port GPIOC
 #define Motor_Left_AIN2_Pin GPIO_PIN_1
 #define Motor_Left_AIN2_GPIO_Port GPIOC
 #define Motor_Right_BIN1_Pin GPIO_PIN_2
@@ -87,10 +91,8 @@ void Error_Handler(void);
 #define RightReap_Pin GPIO_PIN_10
 #define RightReap_GPIO_Port GPIOB
 #define RightReap_EXTI_IRQn EXTI15_10_IRQn
-#define Motor_PWM_Pin GPIO_PIN_6
-#define Motor_PWM_GPIO_Port GPIOC
-#define OLED_DC_Pin GPIO_PIN_2
-#define OLED_DC_GPIO_Port GPIOD
+#define Distance_Trig_Pin GPIO_PIN_8
+#define Distance_Trig_GPIO_Port GPIOC
 #define OLED_SPI1_SCK_Pin GPIO_PIN_3
 #define OLED_SPI1_SCK_GPIO_Port GPIOB
 
