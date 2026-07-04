@@ -104,7 +104,7 @@ void  Motor_Stop(){
 
 void Motor_Set_Speed(float Speed){
     if (Speed > 0){
-        __HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_1,int(min(Speed,1.0) * htim3.Instance->ARR));
+        __HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_1,(int)(min(Speed,1.0) * htim3.Instance->ARR));
     }
     
 }
