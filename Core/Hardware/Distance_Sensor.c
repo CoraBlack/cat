@@ -24,7 +24,7 @@ void Distance_Sensor_Init(){
 
 void Distance_sensor_start(){
     HAL_GPIO_WritePin(Distance_Trig_GPIO_Port, Distance_Trig_Pin, GPIO_PIN_SET);
-    for (volatile uint32_t i = 0; i < 3360;; i++);
+    for (volatile uint32_t i = 0; i < 3360; i++);
     HAL_GPIO_WritePin(Distance_Trig_GPIO_Port, Distance_Trig_Pin, GPIO_PIN_RESET);
 
 

@@ -7,7 +7,7 @@
 typedef struct {
     const uint8_t **frame_list;
     uint8_t frame_count;
-} AnimationTypedef;
+} Animation;
 
 typedef struct {
     uint8_t current_emotion;

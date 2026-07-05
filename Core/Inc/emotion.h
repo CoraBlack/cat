@@ -18,6 +18,6 @@ typedef enum {
     Emotion_Curious,
     Emotion_Shy,
     Emotion_Count 
-} EmotionTypeDef
+} EmotionTypeDef;
 
 #endif 
