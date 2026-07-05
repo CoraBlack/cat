@@ -1,6 +1,7 @@
 #include "ESP_Bridge.h"
 #include "main.h"
 #include "stm32f4xx_hal.h"
+#include "animation.h" /* get_pet_emotion / EmotionTypeDef */
 #include <string.h>
 
 extern SPI_HandleTypeDef hspi2;
@@ -51,6 +52,29 @@ void ESP_Bridge_Init(void) {
     HAL_NVIC_EnableIRQ(ESP_Bridge_HS_EXTI_IRQn);
 
     ESP_Bridge_HS_ISR(); /* 读取初始相位 */
+}
+
+static int emotion_to_code(EmotionTypeDef e) {
+    switch (e) {
+        case Emotion_Normal:  return 0;
+        case Emotion_Happy:   return 1;
+        case Emotion_Alert:   return 2;
+        case Emotion_Angry:   return 3;
+        case Emotion_Curious: return 4;
+        case Emotion_Shy:     return 5;
+        default:              return 0;
+    }
+}
+
+void ESP_Bridge_Start(void) {
+    int code = emotion_to_code(get_pet_emotion());
+
+    /* 构建控制帧：[0x01][code][0x00][0x00] + 1276B 补零。 */
+    uint8_t ctrl[ESP_SPI_FRAME_BYTES];
+    memset(ctrl, 0, sizeof(ctrl));
+    ctrl[0] = 0x01;
+    ctrl[1] = (uint8_t)code;
+    ESP_Bridge_SendMic((const int16_t *)ctrl);
 }
 
 void ESP_Bridge_HS_ISR(void) {
@@ -143,6 +167,9 @@ void ESP_Bridge_TestChat(const int16_t *pcm, uint32_t samples) {
     }
 
     int16_t frame[ESP_SPI_FRAME_SAMPLES];
+
+    /* 0) 先发情绪控制帧开启回合（等同唤醒动作）。 */
+    ESP_Bridge_Start();
 
     /* 1) 发送自录语音（末帧补零对齐到整帧）。 */
     uint32_t idx = 0;
