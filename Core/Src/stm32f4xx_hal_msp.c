@@ -25,6 +25,8 @@
 /* USER CODE END Includes */
 extern DMA_HandleTypeDef hdma_spi3_rx;
 
+extern DMA_HandleTypeDef hdma_spi4_tx;
+
 extern DMA_HandleTypeDef hdma_spi2_rx;
 
 /* Private typedef -----------------------------------------------------------*/
@@ -159,34 +161,19 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c)
 void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(hi2s->Instance==SPI3)
   {
     /* USER CODE BEGIN SPI3_MspInit 0 */
 
     /* USER CODE END SPI3_MspInit 0 */
-
-  /** Initializes the peripherals clock
-  */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S;
-    PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
-    PeriphClkInitStruct.PLLI2S.PLLI2SM = 4;
-    PeriphClkInitStruct.PLLI2S.PLLI2SR = 4;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
     /* Peripheral clock enable */
     __HAL_RCC_SPI3_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     /**I2S3 GPIO Configuration
     PA4     ------> I2S3_WS
-    PB12     ------> I2S3_CK
-    PC11     ------> I2S3_ext_SD
+    PC10     ------> I2S3_CK
     PC12     ------> I2S3_SD
     */
     GPIO_InitStruct.Pin = GPIO_PIN_4;
@@ -196,21 +183,7 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
     GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_12;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF7_SPI3;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF5_I2S3ext;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_12;
+    GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -239,7 +212,58 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
     /* USER CODE BEGIN SPI3_MspInit 1 */
 
     /* USER CODE END SPI3_MspInit 1 */
+  }
+  else if(hi2s->Instance==SPI4)
+  {
+    /* USER CODE BEGIN SPI4_MspInit 0 */
 
+    /* USER CODE END SPI4_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_SPI4_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**I2S4 GPIO Configuration
+    PA1     ------> I2S4_SD
+    PB12     ------> I2S4_WS
+    PB13     ------> I2S4_CK
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF5_SPI4;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF6_SPI4;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    /* I2S4 DMA Init */
+    /* SPI4_TX Init */
+    hdma_spi4_tx.Instance = DMA2_Stream1;
+    hdma_spi4_tx.Init.Channel = DMA_CHANNEL_4;
+    hdma_spi4_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_spi4_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_spi4_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_spi4_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_spi4_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_spi4_tx.Init.Mode = DMA_NORMAL;
+    hdma_spi4_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_spi4_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_spi4_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hi2s,hdmatx,hdma_spi4_tx);
+
+    /* USER CODE BEGIN SPI4_MspInit 1 */
+
+    /* USER CODE END SPI4_MspInit 1 */
   }
 
 }
@@ -262,21 +286,41 @@ void HAL_I2S_MspDeInit(I2S_HandleTypeDef* hi2s)
 
     /**I2S3 GPIO Configuration
     PA4     ------> I2S3_WS
-    PB12     ------> I2S3_CK
-    PC11     ------> I2S3_ext_SD
+    PC10     ------> I2S3_CK
     PC12     ------> I2S3_SD
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_4);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12);
-
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_11|GPIO_PIN_12);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10|GPIO_PIN_12);
 
     /* I2S3 DMA DeInit */
     HAL_DMA_DeInit(hi2s->hdmarx);
     /* USER CODE BEGIN SPI3_MspDeInit 1 */
 
     /* USER CODE END SPI3_MspDeInit 1 */
+  }
+  else if(hi2s->Instance==SPI4)
+  {
+    /* USER CODE BEGIN SPI4_MspDeInit 0 */
+
+    /* USER CODE END SPI4_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_SPI4_CLK_DISABLE();
+
+    /**I2S4 GPIO Configuration
+    PA1     ------> I2S4_SD
+    PB12     ------> I2S4_WS
+    PB13     ------> I2S4_CK
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1);
+
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12|GPIO_PIN_13);
+
+    /* I2S4 DMA DeInit */
+    HAL_DMA_DeInit(hi2s->hdmatx);
+    /* USER CODE BEGIN SPI4_MspDeInit 1 */
+
+    /* USER CODE END SPI4_MspDeInit 1 */
   }
 
 }
@@ -331,10 +375,11 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     __HAL_RCC_SPI2_CLK_ENABLE();
 
     __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     /**SPI2 GPIO Configuration
-    PB13     ------> SPI2_SCK
     PB14     ------> SPI2_MISO
     PB15     ------> SPI2_MOSI
+    PC7     ------> SPI2_SCK
     */
     GPIO_InitStruct.Pin = ESP_Bridhe_SCK_Pin|ESP_Bridge_MISO_Pin|ESP_Bridge_MOSI_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -342,6 +387,13 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_7;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     /* SPI2 DMA Init */
     /* SPI2_RX Init */
@@ -406,9 +458,9 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     __HAL_RCC_SPI2_CLK_DISABLE();
 
     /**SPI2 GPIO Configuration
-    PB13     ------> SPI2_SCK
     PB14     ------> SPI2_MISO
     PB15     ------> SPI2_MOSI
+    PC7     ------> SPI2_SCK
     */
     HAL_GPIO_DeInit(GPIOB, ESP_Bridhe_SCK_Pin|ESP_Bridge_MISO_Pin|ESP_Bridge_MOSI_Pin);
 

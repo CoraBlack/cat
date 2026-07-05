@@ -22,7 +22,7 @@ void INMP441_Init(){
 
 void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s) {
     if (hi2s->Instance == SPI3) {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
         audio_frame_ready = 1; 
     }
     

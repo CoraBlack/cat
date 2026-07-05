@@ -62,7 +62,9 @@
 I2C_HandleTypeDef hi2c1;
 
 I2S_HandleTypeDef hi2s3;
+I2S_HandleTypeDef hi2s4;
 DMA_HandleTypeDef hdma_spi3_rx;
+DMA_HandleTypeDef hdma_spi4_tx;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
@@ -80,10 +82,14 @@ uint32_t last_infrared_time = 0;
 uint32_t last_animation_time = 0;
 uint32_t last_motor_time = 0;
 uint32_t last_interaction_time = 0; // 加了这一行：交互模块时间基准
+// extern static uint32_t I2s_TX_Buffer[MAX_SAMPLES];
+extern uint16_t i2s_rx_buffer[];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM3_Init(void);
@@ -94,6 +100,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_I2S3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_I2S4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -127,6 +134,9 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+  /* Configure the peripherals common clocks */
+  PeriphCommonClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -142,6 +152,7 @@ int main(void)
   MX_I2S3_Init();
   MX_TIM4_Init();
   MX_I2C1_Init();
+  MX_I2S4_Init();
   /* USER CODE BEGIN 2 */
 
 
@@ -173,22 +184,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-  
+    
     
     OLED_ShowNum(1, 1, 1,1);
-    cJSON *a = Extract_Left_Channel();
-    if (a != NULL) {
-      cJSON *name = cJSON_GetObjectItem(a, "contents");
-      for(int i= 0; i < 10;i++){
-        char * val = name->valuestring;
-        OLED_ShowChar(2, i, val[i]);
-      }
+    // cJSON *a = Extract_Left_Channel();
+    // if (a != NULL) {
+    //   cJSON *name = cJSON_GetObjectItem(a, "contents");
+    //   for(int i= 0; i < 10;i++){
+    //     char * val = name->valuestring;
+    //     OLED_ShowChar(2, i, val[i]);
+    //   }
       
-    }
+    // }
     
     
 
-    cJSON_Delete(a);
+    // cJSON_Delete(a);
     OLED_ShowNum(1, 1, 0,1);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
     HAL_Delay(100);
@@ -297,6 +308,26 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
+void PeriphCommonClock_Config(void)
+{
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Initializes the peripherals clock
+  */
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S;
+  PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
+  PeriphClkInitStruct.PLLI2S.PLLI2SM = 4;
+  PeriphClkInitStruct.PLLI2S.PLLI2SR = 4;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
   * @brief I2C1 Initialization Function
   * @param None
   * @retval None
@@ -353,7 +384,7 @@ static void MX_I2S3_Init(void)
   hi2s3.Init.AudioFreq = I2S_AUDIOFREQ_16K;
   hi2s3.Init.CPOL = I2S_CPOL_LOW;
   hi2s3.Init.ClockSource = I2S_CLOCK_PLL;
-  hi2s3.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_ENABLE;
+  hi2s3.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;
   if (HAL_I2S_Init(&hi2s3) != HAL_OK)
   {
     Error_Handler();
@@ -361,6 +392,40 @@ static void MX_I2S3_Init(void)
   /* USER CODE BEGIN I2S3_Init 2 */
 
   /* USER CODE END I2S3_Init 2 */
+
+}
+
+/**
+  * @brief I2S4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2S4_Init(void)
+{
+
+  /* USER CODE BEGIN I2S4_Init 0 */
+
+  /* USER CODE END I2S4_Init 0 */
+
+  /* USER CODE BEGIN I2S4_Init 1 */
+
+  /* USER CODE END I2S4_Init 1 */
+  hi2s4.Instance = SPI4;
+  hi2s4.Init.Mode = I2S_MODE_MASTER_TX;
+  hi2s4.Init.Standard = I2S_STANDARD_PHILIPS;
+  hi2s4.Init.DataFormat = I2S_DATAFORMAT_16B_EXTENDED;
+  hi2s4.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
+  hi2s4.Init.AudioFreq = I2S_AUDIOFREQ_8K;
+  hi2s4.Init.CPOL = I2S_CPOL_LOW;
+  hi2s4.Init.ClockSource = I2S_CLOCK_PLL;
+  hi2s4.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;
+  if (HAL_I2S_Init(&hi2s4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2S4_Init 2 */
+
+  /* USER CODE END I2S4_Init 2 */
 
 }
 
@@ -647,6 +712,7 @@ static void MX_DMA_Init(void)
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
 
   /* DMA interrupt init */
   /* DMA1_Stream0_IRQn interrupt configuration */
@@ -655,6 +721,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Stream3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+  /* DMA2_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 
 }
 

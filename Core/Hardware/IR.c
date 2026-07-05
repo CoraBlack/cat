@@ -2,6 +2,8 @@
 #include "main.h"
 #include "Motor.h"
 #include "ESP_Bridge.h"
+#include "stm32f411xe.h"
+#include "stm32f4xx_hal_gpio.h"
 #include <stdint.h>
 
 volatile uint8_t ir_flags = 0;
@@ -37,6 +39,7 @@ static uint32_t       phase_start_tick = 0;
 /*======================== 3. 中断回调 (极简、安全) ========================*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     // 仅置位标志，绝不在中断里做任何耗时操作
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
     switch (GPIO_Pin) {
         case LeftFront_Pin:  ir_flags |= FLAG_LEFT_FRONT;  break;
         case RightFront_Pin: ir_flags |= FLAG_RIGHT_FRONT; break;
