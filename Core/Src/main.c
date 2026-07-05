@@ -97,9 +97,9 @@ static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_I2S3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_I2S3_Init(void);
 static void MX_I2S4_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -149,9 +149,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI2_Init();
   MX_USART1_UART_Init();
-  MX_I2S3_Init();
   MX_TIM4_Init();
   MX_I2C1_Init();
+  MX_I2S3_Init();
   MX_I2S4_Init();
   /* USER CODE BEGIN 2 */
 
@@ -747,18 +747,15 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, OLED_DC_Pin|OLED_RST_Pin|Motor_Left_AIN1_Pin|Motor_Left_AIN2_Pin
-                          |Motor_Right_BIN1_Pin|Motor_Right_BIN2_Pin|OLED_CS_Pin|ESP_Bridge_CS_Pin
-                          |Distance_Trig_Pin, GPIO_PIN_RESET);
+                          |Motor_Right_BIN1_Pin|Motor_Right_BIN2_Pin|OLED_CS_Pin|Distance_Trig_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : OLED_DC_Pin OLED_RST_Pin Motor_Left_AIN1_Pin Motor_Left_AIN2_Pin
-                           Motor_Right_BIN1_Pin Motor_Right_BIN2_Pin OLED_CS_Pin ESP_Bridge_CS_Pin
-                           Distance_Trig_Pin */
+                           Motor_Right_BIN1_Pin Motor_Right_BIN2_Pin OLED_CS_Pin Distance_Trig_Pin */
   GPIO_InitStruct.Pin = OLED_DC_Pin|OLED_RST_Pin|Motor_Left_AIN1_Pin|Motor_Left_AIN2_Pin
-                          |Motor_Right_BIN1_Pin|Motor_Right_BIN2_Pin|OLED_CS_Pin|ESP_Bridge_CS_Pin
-                          |Distance_Trig_Pin;
+                          |Motor_Right_BIN1_Pin|Motor_Right_BIN2_Pin|OLED_CS_Pin|Distance_Trig_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -777,11 +774,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ESP_Bridge_HS_Pin */
-  GPIO_InitStruct.Pin = ESP_Bridge_HS_Pin;
+  /*Configure GPIO pins : ESP_Bridge_HS_Pin ESP_Bridge_CS_Pin */
+  GPIO_InitStruct.Pin = ESP_Bridge_HS_Pin|ESP_Bridge_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ESP_Bridge_HS_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);

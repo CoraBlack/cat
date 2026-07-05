@@ -32,9 +32,7 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 enable_language(C ASM)
 
 # Create an executable object type
-add_executable(${CMAKE_PROJECT_NAME}
-   Core/hardware/ESP_SPI.h
-   Core/hardware/OLED_Font.h)
+add_executable(${CMAKE_PROJECT_NAME})
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -56,7 +54,7 @@ set (HARDWARE_SRCS
     "./Core/Hardware/IR.c"
     "./Core/Hardware/MAX98357.c"
     "./Core/Hardware/Motor.c"
-    "./Core/Hardware/OLED.c"
+
     "./Core/Hardware/TEXT_OLED.c"
 )
 
@@ -92,18 +90,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
     ${HARDWARE_SRCS}
     ${STM_SRCS}
-    Core/hardware/MAX98357.c
-    Core/Src/oled.c
-    # Core/Src/animation.c
-    Core/Src/oled_frames.c
-    Core/Src/interaction.c
-    Core/Src/emotion.c
-
-    Core/hardware/ESP_SPI.c
-    Core/hardware/Distance_Sensor.c
-    Core/hardware/Motor.c
-    Core/hardware/IR.c
-    Core/hardware/INMP441.c
+    
 )
 
 # Add include paths

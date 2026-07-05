@@ -197,10 +197,10 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
     hdma_spi3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_spi3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_spi3_rx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_spi3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_spi3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_spi3_rx.Init.Mode = DMA_CIRCULAR;
-    hdma_spi3_rx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_spi3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_spi3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_spi3_rx.Init.Mode = DMA_NORMAL;
+    hdma_spi3_rx.Init.Priority = DMA_PRIORITY_LOW;
     hdma_spi3_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_spi3_rx) != HAL_OK)
     {
@@ -381,19 +381,19 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     PB15     ------> SPI2_MOSI
     PC7     ------> SPI2_SCK
     */
-    GPIO_InitStruct.Pin = ESP_Bridhe_SCK_Pin|ESP_Bridge_MISO_Pin|ESP_Bridge_MOSI_Pin;
+    GPIO_InitStruct.Pin = ESP_Bridge_MISO_Pin|ESP_Bridge_MOSI_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_7;
+    GPIO_InitStruct.Pin = ESP_Bridhe_SCK_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    HAL_GPIO_Init(ESP_Bridhe_SCK_GPIO_Port, &GPIO_InitStruct);
 
     /* SPI2 DMA Init */
     /* SPI2_RX Init */
@@ -462,7 +462,9 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     PB15     ------> SPI2_MOSI
     PC7     ------> SPI2_SCK
     */
-    HAL_GPIO_DeInit(GPIOB, ESP_Bridhe_SCK_Pin|ESP_Bridge_MISO_Pin|ESP_Bridge_MOSI_Pin);
+    HAL_GPIO_DeInit(GPIOB, ESP_Bridge_MISO_Pin|ESP_Bridge_MOSI_Pin);
+
+    HAL_GPIO_DeInit(ESP_Bridhe_SCK_GPIO_Port, ESP_Bridhe_SCK_Pin);
 
     /* SPI2 DMA DeInit */
     HAL_DMA_DeInit(hspi->hdmarx);
