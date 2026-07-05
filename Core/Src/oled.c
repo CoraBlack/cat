@@ -242,3 +242,4 @@ int oled_refresh(OledTypedef *oled)
 
 	return 0;
 }
+
