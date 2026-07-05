@@ -66,9 +66,17 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${HARDWARE_SRCS}
     ${STM_SRCS}
     Core/hardware/MAX98357.c
-    Core/hardware/MAX98357.h
-    
+    Core/Src/oled.c
+    Core/Src/animation.c
+    Core/Src/oled_frames.c
+    Core/Src/interaction.c
+    Core/Src/emotion.c
 
+    Core/hardware/ESP_SPI.c
+    Core/hardware/Distance_Sensor.c
+    Core/hardware/Motor.c
+    Core/hardware/IR.c
+    Core/hardware/INMP441.c
 )
 
 # Add include paths
