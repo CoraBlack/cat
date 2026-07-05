@@ -33,6 +33,7 @@
 #include "stm32f4xx_hal_def.h"
 #include "INMP441.h"
 #include "stm32f4xx_hal_gpio.h"
+#include "ESP_Bridge.h"
 #include <stdint.h>
 #include <sys/_intsup.h>
 
@@ -164,6 +165,7 @@ int main(void)
 
   OLED_Init();
   INMP441_Init();
+  ESP_Bridge_Init();   // ESP↔STM SPI 桥接：TX DMA + 握手双边沿 EXTI + CS 置高
   
   /* USER CODE END 2 */
 

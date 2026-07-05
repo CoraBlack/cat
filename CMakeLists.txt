@@ -49,7 +49,7 @@ set(STM_DIR ${PROJECT_SOURCE_DIR}/Core/Src)
 
 set (HARDWARE_SRCS
     "./Core/Hardware/Distance_Sensor.c"
-    "./Core/Hardware/ESP_SPI.c"
+    "./Core/Hardware/ESP_Bridge.c"
     "./Core/Hardware/INMP441.c"
     "./Core/Hardware/IR.c"
     "./Core/Hardware/MAX98357.c"
@@ -59,10 +59,10 @@ set (HARDWARE_SRCS
 )
 
 set (STM_SRCS 
-    # "./Core/Src/animation.c"
+    "./Core/Src/animation.c"
     "./Core/Src/base64.c"
     "./Core/Src/cJSON.c"
-    # "./Core/Src/interaction.c"
+    "./Core/Src/interaction.c"
     "./Core/Src/main.c"
     "./Core/Src/oled_frames.c"
     "./Core/Src/stm32f4xx_hal_msp.c"

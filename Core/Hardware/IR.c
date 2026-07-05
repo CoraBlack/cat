@@ -1,6 +1,7 @@
 #include "IR.h"
 #include "main.h"
 #include "Motor.h"
+#include "ESP_Bridge.h"
 #include <stdint.h>
 
 volatile uint8_t ir_flags = 0;
@@ -41,6 +42,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         case RightFront_Pin: ir_flags |= FLAG_RIGHT_FRONT; break;
         case LeftReap_Pin:   ir_flags |= FLAG_LEFT_REAR;   break; 
         case RightReap_Pin:  ir_flags |= FLAG_RIGHT_REAR;  break;
+        case ESP_Bridge_HS_Pin: ESP_Bridge_HS_ISR();       break; /* ESP 握手相位 */
         default: break;
     }
 }
