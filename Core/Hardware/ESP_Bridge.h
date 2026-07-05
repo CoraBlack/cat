@@ -22,6 +22,13 @@ void ESP_Bridge_Init(void);
 /** @brief 返回当前相位（由握手线 EXTI 维护）。 */
 EspPhase ESP_Bridge_Phase(void);
 
+/**
+ * @brief 开始一个对话回合：读取当前宠物情绪(get_pet_emotion)，映射为协议情绪码，
+ *        以"控制帧"发给 ESP（帧头 [0x01][code]），之后即可正常发麦克风音频帧。
+ *        详见 PROTOCOL.md 的"控制帧 / 情绪上行"。
+ */
+void ESP_Bridge_Start(void);
+
 /** @brief 握手线 EXTI 事件处理：由 IR.c 的 HAL_GPIO_EXTI_Callback 转发调用。 */
 void ESP_Bridge_HS_ISR(void);
 
