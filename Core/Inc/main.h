@@ -61,6 +61,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define OLED_DC_Pin GPIO_PIN_13
 #define OLED_DC_GPIO_Port GPIOC
+#define Speaker_CTL_Pin GPIO_PIN_14
+#define Speaker_CTL_GPIO_Port GPIOC
 #define OLED_RST_Pin GPIO_PIN_15
 #define OLED_RST_GPIO_Port GPIOC
 #define Motor_Left_AIN1_Pin GPIO_PIN_0

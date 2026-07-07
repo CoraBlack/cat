@@ -122,8 +122,6 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
-  extern uint32_t I2s_TX_Buffer[1280];
-  extern uint16_t i2s_rx_buffer[];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -180,17 +178,15 @@ int main(void)
 
   OLED_Init();
   INMP441_Init();
+  MAX98357_Init();     // 配置功放默认关断(Speaker_CTL 拉低)，麦克风运行时不放大耦合噪声
   ESP_Bridge_Init();   // ESP↔STM SPI 桥接：TX DMA + 握手双边沿 EXTI + CS 置高
-  
+
+  MAX98357_SelfTest();   // 功放链路自测：使能→播放 2s 1kHz 正弦→关断（验证后可注释）
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-// 放在 while(1) 外面定义
-  static uint32_t phase = 0; 
-  if (HAL_I2S_GetState(&hi2s4) != HAL_I2S_STATE_READY) {  
-    Error_Handler(); // I2S初始化失败！
-  }
   while (1) {
     // 故意填入一个极其明显的、非音频的固定值
 
@@ -743,8 +739,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, OLED_DC_Pin|OLED_RST_Pin|Motor_Left_AIN1_Pin|Motor_Left_AIN2_Pin
-                          |Motor_Right_BIN1_Pin|Motor_Right_BIN2_Pin|OLED_CS_Pin|Distance_Trig_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, OLED_DC_Pin|Speaker_CTL_Pin|OLED_RST_Pin|Motor_Left_AIN1_Pin
+                          |Motor_Left_AIN2_Pin|Motor_Right_BIN1_Pin|Motor_Right_BIN2_Pin|OLED_CS_Pin
+                          |Distance_Trig_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
@@ -757,6 +754,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : Speaker_CTL_Pin */
+  GPIO_InitStruct.Pin = Speaker_CTL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(Speaker_CTL_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PA5 */
   GPIO_InitStruct.Pin = GPIO_PIN_5;
