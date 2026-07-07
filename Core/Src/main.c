@@ -36,6 +36,9 @@
 #include "ESP_Bridge.h"
 #include <stdint.h>
 #include <sys/_intsup.h>
+#include "MAX98357.h"
+#include <string.h>
+#include <math.h>
 
 /* USER CODE END Includes */
 
@@ -83,7 +86,7 @@ uint32_t last_animation_time = 0;
 uint32_t last_motor_time = 0;
 uint32_t last_interaction_time = 0; // 加了这一行：交互模块时间基准
 // extern static uint32_t I2s_TX_Buffer[MAX_SAMPLES];
-extern uint16_t i2s_rx_buffer[];
+
 
 /* USER CODE END PV */
 
@@ -119,7 +122,8 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
-  extern uint8_t audio_frame_ready;
+  extern uint32_t I2s_TX_Buffer[1280];
+  extern uint16_t i2s_rx_buffer[];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -182,27 +186,20 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    
-    
-    OLED_ShowNum(1, 1, 1,1);
-    // cJSON *a = Extract_Left_Channel();
-    // if (a != NULL) {
-    //   cJSON *name = cJSON_GetObjectItem(a, "contents");
-    //   for(int i= 0; i < 10;i++){
-    //     char * val = name->valuestring;
-    //     OLED_ShowChar(2, i, val[i]);
-    //   }
-      
-    // }
-    
-    
+// 放在 while(1) 外面定义
+  static uint32_t phase = 0; 
+  if (HAL_I2S_GetState(&hi2s4) != HAL_I2S_STATE_READY) {  
+    Error_Handler(); // I2S初始化失败！
+  }
+  while (1) {
+    // 故意填入一个极其明显的、非音频的固定值
+
+
 
     // cJSON_Delete(a);
-    OLED_ShowNum(1, 1, 0,1);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-    HAL_Delay(100);
+    // OLED_ShowNum(1, 1, 0,1);
+    // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+    // HAL_Delay(100);
     // uint32_t rx_data = 0;
     // HAL_StatusTypeDef status = HAL_I2S_Receive(&hi2s3, (uint16_t*)&rx_data, 1, 100);
 
@@ -413,9 +410,9 @@ static void MX_I2S4_Init(void)
   hi2s4.Instance = SPI4;
   hi2s4.Init.Mode = I2S_MODE_MASTER_TX;
   hi2s4.Init.Standard = I2S_STANDARD_PHILIPS;
-  hi2s4.Init.DataFormat = I2S_DATAFORMAT_16B_EXTENDED;
+  hi2s4.Init.DataFormat = I2S_DATAFORMAT_16B;
   hi2s4.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
-  hi2s4.Init.AudioFreq = I2S_AUDIOFREQ_8K;
+  hi2s4.Init.AudioFreq = I2S_AUDIOFREQ_22K;
   hi2s4.Init.CPOL = I2S_CPOL_LOW;
   hi2s4.Init.ClockSource = I2S_CLOCK_PLL;
   hi2s4.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;

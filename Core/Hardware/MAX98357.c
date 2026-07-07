@@ -6,50 +6,36 @@
 #include "base64.h"
 
 
-#define MAX_SAMPLES 1280 / 2
+/* MAX98357.c */
+#define MAX_SAMPLES 1280
+uint16_t I2s_TX_Buffer[MAX_SAMPLES];
 extern I2S_HandleTypeDef hi2s4;
-// extern char * json_rx_buffer;
-static uint32_t I2s_TX_Buffer[MAX_SAMPLES];
-extern uint16_t i2s_rx_buffer[];
-// static volatile uint32_t sample_count = 1280;
 
-// static uint32_t _get_str_len(const char *str) {
-//     if (str == NULL) return 0;
-//     uint32_t len = 0;
-//     while (str[len] != '\0') {
-//         len++;
-//     }
-//     return len;
-// }
+// 仅用于首次启动
+void MAX98357_I2S_Start(void){
+    HAL_I2S_Transmit_DMA(&hi2s4, I2s_TX_Buffer, MAX_SAMPLES);
+}
 
+// DMA 传输完成回调（自动双缓冲交替）
+void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+    if (hi2s->Instance == SPI4)
+    {
+        // ✅ 在这里填数据！DMA 刚把这块搬走，现在填绝对安全
+        for (uint32_t i = 0; i < MAX_SAMPLES; i++) {
+            // 16B_EXTENDED 模式下，直接填 16bit 值即可
+            I2s_TX_Buffer[i] = 0x55AA; 
+        }
+    }
+}
 
-// void Get_audio_data(){
-
-//     cJSON * root = cJSON_Parse(json_rx_buffer);
-//     if (root != NULL){
-//         static uint8_t base64_buffer[MAX_SAMPLES * 3];
-//         int len = base64_decode_safe(root->valuestring, _get_str_len(root->valuestring), base64_buffer, sizeof(base64_buffer));
-//         sample_count = (uint32_t)(len / 3);
-//         if (sample_count > MAX_SAMPLES) sample_count = MAX_SAMPLES;
-//         for (int i = 0;i < sample_count;i++){
-//             int index = i* 3;
-//             uint32_t raw_data = base64_buffer[index] << 16 | base64_buffer[index + 1] << 8 | base64_buffer[index + 2];
-//             if (raw_data & 0x00800000){
-//                 raw_data |= 0xFF000000;
-//             }
-            
-//             I2s_TX_Buffer[i] = raw_data;
-//         }
-//         cJSON_Delete(root);
-
-//     }
-    
-   
-// }
-
-
-
-
-void MAX98357_I2S_Send(){
-    HAL_I2S_Transmit_DMA(&hi2s4, (uint16_t*)i2s_rx_buffer, 1280 / 2);
+// 半传输完成回调（可选，为了无缝衔接最好也加上）
+void HAL_I2S_TxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+    if (hi2s->Instance == SPI4)
+    {
+        for (uint32_t i = 0; i < MAX_SAMPLES / 2; i++) {
+            I2s_TX_Buffer[i] = 0x55AA; 
+        }
+    }
 }
