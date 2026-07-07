@@ -412,7 +412,7 @@ static void MX_I2S4_Init(void)
   hi2s4.Init.Standard = I2S_STANDARD_PHILIPS;
   hi2s4.Init.DataFormat = I2S_DATAFORMAT_16B;
   hi2s4.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
-  hi2s4.Init.AudioFreq = I2S_AUDIOFREQ_22K;
+  hi2s4.Init.AudioFreq = 24000;
   hi2s4.Init.CPOL = I2S_CPOL_LOW;
   hi2s4.Init.ClockSource = I2S_CLOCK_PLL;
   hi2s4.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;
